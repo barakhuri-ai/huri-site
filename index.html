@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>[hidden]{display:none!important}body{margin:0}img{max-width:100%}</style>
+<title>הרשמה למסך בית יעקב</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="הרשמה לפרסום על מסך ה־LED בבית הכנסת בית יעקב, נתיבות. Huri Networks.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Secular+One&display=swap">
+<style>
+/* Layout: one narrow column; an LED-panel header band, then the form as four numbered steps. */
+:root {
+  --bg: #f3f4f8;
+  --surface: #ffffff;
+  --ink: #17203a;
+  --muted: #5d6680;
+  --line: #dde1ec;
+  --accent: #c98a12;      /* Negev gold, like a warm LED */
+  --accent-ink: #1a1405;
+  --panel: #131a2e;       /* the screen itself */
+  --panel-ink: #f4f1e6;
+  --led: #f2b53a;
+  --ok: #1d8a4b;
+  --err: #c0362c;
+  --focus: #2f6fe4;
+  --display: "Secular One", "Assistant", "Arial Hebrew", Arial, sans-serif;
+  --body: "Assistant", "Arial Hebrew", Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0e1322; --surface: #161d31; --ink: #ecedf3; --muted: #a2a9bf; --line: #2a3350;
+  --accent: #e5a93a; --accent-ink: #1a1405; --panel: #080c18; --panel-ink: #f4f1e6; --led: #f2b53a;
+  --ok: #4cc27f; --err: #ff7a6e; --focus: #7aa5ff; color-scheme: dark;
+} }
+:root[data-theme="dark"] {
+  --bg: #0e1322; --surface: #161d31; --ink: #ecedf3; --muted: #a2a9bf; --line: #2a3350;
+  --accent: #e5a93a; --accent-ink: #1a1405; --panel: #080c18; --panel-ink: #f4f1e6; --led: #f2b53a;
+  --ok: #4cc27f; --err: #ff7a6e; --focus: #7aa5ff; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 17px; line-height: 1.55; direction: rtl; }
+.wrap { max-width: 640px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+/* Header: a slice of the LED screen */
+.panel { background: var(--panel); color: var(--panel-ink); position: relative; overflow: hidden; }
+.panel::before { content: ""; position: absolute; inset: 0; opacity: .16;
+  background-image: radial-gradient(circle, var(--led) 1.1px, transparent 1.6px); background-size: 7px 7px; }
+.panel .wrap { position: relative; padding-block: 28px 30px; display: grid; gap: 10px; }
+.brand { font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--led); font-weight: 700; direction: ltr; text-align: right; }
+h1 { font-family: var(--display); font-weight: 400; font-size: clamp(28px, 7vw, 40px); line-height: 1.15; margin: 0; text-wrap: balance; }
+.lede { margin: 0; color: #c9ccd8; max-width: 52ch; }
+.slot { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 8px; font-size: 15px; font-variant-numeric: tabular-nums; }
+.slot b { font-family: var(--display); font-weight: 400; color: var(--led); font-size: 20px; margin-left: 4px; }
+.bar { height: 6px; border-radius: 3px; background: rgba(255,255,255,.12); overflow: hidden; margin-top: 6px; }
+.bar i { display: block; height: 100%; width: 0; background: var(--led); animation: slot 12s linear infinite; }
+@keyframes slot { to { width: 100%; } }
+@media (prefers-reduced-motion: reduce) { .bar i { animation: none; width: 100%; opacity: .5; } }
+.bar-label { font-size: 12px; color: #9ea4b8; }
+
+main .wrap { padding-block: 24px 48px; }
+form { display: grid; gap: 18px; }
+fieldset { border: 1px solid var(--line); background: var(--surface); border-radius: 14px; padding: 18px; margin: 0; display: grid; gap: 14px; min-width: 0; }
+legend { font-family: var(--display); font-size: 21px; padding: 0 6px; display: flex; align-items: center; gap: 10px; }
+legend .n { width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); display: inline-grid; place-items: center; font-size: 15px; font-family: var(--body); font-weight: 700; }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 520px) { .row { grid-template-columns: 1fr; } }
+.field { display: grid; gap: 5px; min-width: 0; }
+label { font-weight: 600; font-size: 15px; }
+label .opt { font-weight: 400; color: var(--muted); font-size: 13px; }
+input, textarea, select { font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 11px 12px; width: 100%; }
+textarea { min-height: 96px; resize: vertical; }
+input:focus-visible, textarea:focus-visible, select:focus-visible, button:focus-visible, .drop:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+input[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: var(--err); }
+.hint { font-size: 13px; color: var(--muted); }
+.err { font-size: 13px; color: var(--err); min-height: 0; }
+.ltr { direction: ltr; text-align: right; }
+
+.drop { border: 2px dashed var(--line); border-radius: 12px; padding: 22px 16px; text-align: center; cursor: pointer; display: grid; gap: 4px; background: var(--bg); transition: border-color .15s; }
+.drop:hover, .drop.over { border-color: var(--accent); }
+.drop strong { font-size: 16px; }
+.files { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+.files li { display: flex; align-items: center; gap: 10px; border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; min-width: 0; }
+.files img, .files .ph { width: 44px; height: 44px; border-radius: 6px; object-fit: cover; flex: none; background: var(--panel); color: var(--led); display: grid; place-items: center; font-size: 12px; font-weight: 700; }
+.files .meta { flex: 1; min-width: 0; }
+.files .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; }
+.files .size { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.files button { background: none; border: 0; color: var(--muted); font: inherit; font-size: 14px; cursor: pointer; padding: 4px 6px; }
+
+.terms { margin: 0; padding: 0 18px 0 0; display: grid; gap: 4px; font-size: 15px; color: var(--muted); }
+.check { display: flex; gap: 10px; align-items: flex-start; font-weight: 400; }
+.check a { color: inherit; font-weight: 700; }
+.check input { width: 20px; height: 20px; margin-top: 3px; flex: none; accent-color: var(--accent); }
+
+.price { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 12px; }
+.price .amt { font-family: var(--display); font-size: 26px; font-variant-numeric: tabular-nums; }
+.price .vat { font-size: 14px; color: var(--muted); }
+.submit { font: inherit; font-weight: 700; font-size: 18px; border: 0; border-radius: 12px; padding: 14px 18px; background: var(--accent); color: var(--accent-ink); cursor: pointer; width: 100%; }
+.submit:disabled { opacity: .6; cursor: progress; }
+.form-err { color: var(--err); font-weight: 600; text-align: center; }
+.paymethods { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; border: 0; padding: 0; margin: 0; min-width: 0; }
+.paymethods legend { font-family: var(--body); font-size: 15px; font-weight: 600; padding: 0 0 6px; }
+.paymethods label { position: relative; min-width: 0; display: grid; gap: 2px; border: 1px solid var(--line); background: var(--bg); border-radius: 10px; padding: 10px; cursor: pointer; font-weight: 700; font-size: 15px; text-align: center; }
+.paymethods label small { font-weight: 400; color: var(--muted); font-size: 12px; }
+.paymethods input { position: absolute; opacity: 0; pointer-events: none; }
+.paymethods label:has(input:checked) { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.paymethods label:has(input:focus-visible) { outline: 3px solid var(--focus); outline-offset: 2px; }
+@media (max-width: 400px) { .paymethods { grid-template-columns: 1fr; } }
+.paydetails { background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; display: grid; gap: 6px; text-align: right; }
+.paydetails b { font-size: 16px; }
+.paydetails .num { font-variant-numeric: tabular-nums; direction: ltr; unicode-bidi: isolate; font-weight: 700; }
+.copy { font: inherit; font-size: 14px; font-weight: 700; justify-self: start; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 8px; padding: 5px 12px; cursor: pointer; }
+.hp { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+.done { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 26px 20px; display: grid; gap: 12px; text-align: center; }
+.done h2 { font-family: var(--display); font-weight: 400; font-size: 28px; margin: 0; }
+.done .id { font-variant-numeric: tabular-nums; color: var(--muted); }
+.wa { display: inline-block; justify-self: center; background: var(--ok); color: #fff; text-decoration: none; font-weight: 700; padding: 11px 18px; border-radius: 10px; }
+.demo { font-size: 13px; color: var(--err); }
+footer { text-align: center; color: var(--muted); font-size: 14px; padding-block: 0 32px; }
+footer a { color: inherit; }
+</style>
+</head>
+<body>
+
+<header class="panel">
+  <div class="wrap">
+    <div class="brand">Huri Networks</div>
+    <h1>פרסום על המסך בבית הכנסת בית יעקב, נתיבות</h1>
+    <p class="lede">ממלאים את הפרטים, מעלים לוגו או גרפיקה, ועוברים לתשלום. אנחנו מעצבים את המודעה ומעלים אותה למסך.</p>
+    <div class="slot">
+      <span><b>12</b>שניות בכל סבב</span>
+      <span><b><bdi dir="ltr">05:00–20:00</bdi></b>א׳–ה׳</span>
+      <span><b>500 ₪</b>+ מע״מ לחודש</span>
+    </div>
+    <div>
+      <div class="bar" aria-hidden="true"><i></i></div>
+      <div class="bar-label">כך נראית משבצת של 12 שניות</div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <form id="signup" novalidate>
+      <fieldset>
+        <legend><span class="n">1</span>פרטי העסק</legend>
+        <div class="field">
+          <label for="business">שם העסק</label>
+          <input id="business" name="business" required autocomplete="organization" maxlength="120">
+          <div class="err" id="business-err"></div>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label for="businessId">ח״פ / מספר עוסק</label>
+            <input id="businessId" name="businessId" inputmode="numeric" required maxlength="12" class="ltr">
+            <div class="hint">לצורך החשבונית החודשית</div>
+            <div class="err" id="businessId-err"></div>
+          </div>
+          <div class="field">
+            <label for="category">תחום העסק</label>
+            <input id="category" name="category" list="cats" maxlength="80" placeholder="למשל: מכולת, מספרה, נדל״ן">
+            <datalist id="cats">
+              <option value="מזון ומסעדות"><option value="מכולת / סופר"><option value="אופנה והלבשה">
+              <option value="יופי וטיפוח"><option value="נדל״ן"><option value="שיפוצים ובנייה">
+              <option value="רכב ומוסכים"><option value="חינוך ושיעורים"><option value="בריאות ורפואה">
+              <option value="אירועים ושמחות"><option value="יודאיקה וספרי קודש"><option value="שירותים מקצועיים">
+            </datalist>
+          </div>
+        </div>
+        <div class="field">
+          <label for="address">כתובת העסק <span class="opt">(רשות)</span></label>
+          <input id="address" name="address" autocomplete="street-address" maxlength="200">
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend><span class="n">2</span>איש קשר</legend>
+        <div class="field">
+          <label for="contact">שם מלא</label>
+          <input id="contact" name="contact" required autocomplete="name" maxlength="80">
+          <div class="err" id="contact-err"></div>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label for="phone">טלפון נייד</label>
+            <input id="phone" name="phone" type="tel" required autocomplete="tel" inputmode="tel" class="ltr" placeholder="050-0000000" maxlength="14">
+            <div class="err" id="phone-err"></div>
+          </div>
+          <div class="field">
+            <label for="email">מייל</label>
+            <input id="email" name="email" type="email" required autocomplete="email" class="ltr" maxlength="120">
+            <div class="hint">לכאן תישלח החשבונית</div>
+            <div class="err" id="email-err"></div>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend><span class="n">3</span>המודעה</legend>
+        <div class="field">
+          <span id="files-label" style="font-weight:600;font-size:15px">לוגו, גרפיקה או סרטון <span class="opt">(רשות, אפשר גם אחר כך)</span></span>
+          <div class="drop" id="drop" tabindex="0" role="button" aria-labelledby="files-label">
+            <strong>לחצו להעלאה או גררו לכאן</strong>
+            <span class="hint">תמונה, PDF או סרטון קצר · עד 6 קבצים · עד 25MB ביחד</span>
+          </div>
+          <input id="fileInput" type="file" multiple accept="image/*,video/*,application/pdf" hidden>
+          <ul class="files" id="fileList"></ul>
+          <div class="err" id="files-err"></div>
+        </div>
+        <div class="field">
+          <label for="adText">מה תרצו שיופיע במודעה? <span class="opt">(רשות)</span></label>
+          <textarea id="adText" name="adText" maxlength="1500" placeholder="למשל: מבצע לחגים, 20% הנחה על כל החנות. טלפון להזמנות 08-0000000"></textarea>
+        </div>
+        <div class="field">
+          <label for="notes">הערות נוספות <span class="opt">(רשות)</span></label>
+          <textarea id="notes" name="notes" maxlength="1000" style="min-height:70px"></textarea>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend><span class="n">4</span>אישור ותשלום</legend>
+        <ul class="terms">
+          <li>מודעה של עד 12 שניות בסבב רציף: א׳–ה׳ <bdi dir="ltr">05:00–20:00</bdi>, ושישי עד שעתיים לפני כניסת שבת.</li>
+          <li>בשבתות ובחגים מוצג תוכן קודש בלבד, ללא פרסומות.</li>
+          <li>תשלום חודשי באשראי, בהעברה בנקאית או בביט, ללא התחייבות. ביטול בהודעה לפחות שבוע לפני התשלום הבא.</li>
+          <li>המחיר כולל עיצוב מודעה ראשונית וריענון אחד בכל חודש. סרטון, אנימציה או עיצוב חדש לגמרי בתוספת תשלום.</li>
+          <li>תוכן המודעה כפוף לאישור ולהתאמה לאופי בית הכנסת.</li>
+          <li>הפרטים נשמרים לצורך ההתקשרות, החשבוניות והפרסום בלבד, ולא מועברים לאחרים.</li>
+        </ul>
+        <label class="check" for="terms">
+          <input id="terms" type="checkbox" required>
+          <span>קראתי ואני מאשר/ת את <a href="terms.html" target="_blank" rel="noopener">תנאי ההתקשרות המלאים</a> ואת שמירת הפרטים</span>
+        </label>
+        <div class="err" id="terms-err"></div>
+        <div class="price">
+          <span>תשלום חודשי</span>
+          <span><span class="amt">500 ₪</span> <span class="vat">+ מע״מ</span></span>
+        </div>
+        <fieldset class="paymethods">
+          <legend>איך נוח לכם לשלם?</legend>
+          <label for="pay-card"><input type="radio" name="pay" id="pay-card" value="אשראי" checked>אשראי<small>חיוב חודשי אוטומטי</small></label>
+          <label for="pay-bank"><input type="radio" name="pay" id="pay-bank" value="העברה בנקאית">העברה בנקאית<small>פרטים יישלחו בוואטסאפ</small></label>
+          <label for="pay-bit"><input type="radio" name="pay" id="pay-bit" value="ביט">ביט<small>פרטים יישלחו בוואטסאפ</small></label>
+        </fieldset>
+        <div class="hp" aria-hidden="true"><label for="website">אתר</label><input id="website" name="website" tabindex="-1" autocomplete="off"></div>
+        <button class="submit" id="submitBtn" type="submit">המשך לתשלום</button>
+        <div class="form-err" id="formErr" role="alert"></div>
+      </fieldset>
+    </form>
+
+    <section class="done" id="done" hidden aria-live="polite">
+      <h2 id="doneTitle">ההרשמה התקבלה</h2>
+      <p class="id" id="doneId"></p>
+      <div class="paydetails" id="payDetails" hidden></div>
+      <p id="doneText">קיבלנו את הפרטים. נחזור אליכם בוואטסאפ עם קישור לתשלום והצעת עיצוב למודעה.</p>
+      <a class="wa" href="https://wa.me/972542193565" target="_blank" rel="noopener">לשאלות בוואטסאפ</a>
+      <p class="demo" id="demoNote" hidden>מצב תצוגה: הטופס עוד לא מחובר, הפרטים לא נשמרו.</p>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">Huri Networks · <span class="ltr" style="display:inline-block">054-219-3565</span> · חלק מההכנסות מוקדש לחיזוק בית הכנסת בית יעקב</div>
+</footer>
+
+<script>
+// ───── הגדרות: שתי שורות שמתעדכנות בהתקנה ─────
+const SCRIPT_URL  = 'https://script.google.com/macros/s/AKfycbzXb-iPy1ggHHNqXfYmi3NNWNLL8-fj4LIvWj_o_BysL1GT3sTXIyloN3rbnsHVUVlv/exec';   // כתובת ה־Web App מגוגל (מסתיימת ב־/exec)
+const PAYMENT_URL = '';   // קישור לדף התשלום של סמארטבי
+const BIT_PHONE   = '054-219-3565';
+
+const MAX_FILES = 6, MAX_BYTES = 25 * 1024 * 1024;
+const $ = id => document.getElementById(id);
+const form = $('signup'), drop = $('drop'), fileInput = $('fileInput'), list = $('fileList');
+let files = [];
+
+const fmt = b => b > 1048576 ? (b / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(b / 1024)) + ' KB';
+
+function renderFiles() {
+  list.replaceChildren();
+  files.forEach((f, i) => {
+    const li = document.createElement('li');
+    let thumb;
+    if (f.type.startsWith('image/')) { thumb = document.createElement('img'); thumb.src = URL.createObjectURL(f); thumb.alt = ''; }
+    else { thumb = document.createElement('span'); thumb.className = 'ph'; thumb.textContent = f.type.startsWith('video/') ? 'וידאו' : 'PDF'; }
+    const meta = document.createElement('div'); meta.className = 'meta';
+    const n = document.createElement('div'); n.className = 'name'; n.textContent = f.name;
+    const s = document.createElement('div'); s.className = 'size'; s.textContent = fmt(f.size);
+    meta.append(n, s);
+    const rm = document.createElement('button'); rm.type = 'button'; rm.textContent = 'הסרה';
+    rm.setAttribute('aria-label', 'הסרת ' + f.name);
+    rm.onclick = () => { files.splice(i, 1); renderFiles(); };
+    li.append(thumb, meta, rm); list.append(li);
+  });
+  const total = files.reduce((a, f) => a + f.size, 0);
+  $('files-err').textContent = total > MAX_BYTES
+    ? `הקבצים ביחד שוקלים ${fmt(total)}. אפשר עד 25MB. סרטון גדול? שלחו אותו בוואטסאפ אחרי ההרשמה.` : '';
+}
+
+function addFiles(fl) {
+  const ok = [...fl].filter(f => /^(image\/|video\/|application\/pdf)/.test(f.type));
+  if (ok.length < fl.length) $('files-err').textContent = 'אפשר להעלות רק תמונות, PDF או סרטונים.';
+  files = files.concat(ok).slice(0, MAX_FILES);
+  renderFiles();
+}
+
+drop.addEventListener('click', () => fileInput.click());
+drop.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); } });
+fileInput.addEventListener('change', () => { addFiles(fileInput.files); fileInput.value = ''; });
+['dragenter', 'dragover'].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.add('over'); }));
+['dragleave', 'drop'].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.remove('over'); }));
+drop.addEventListener('drop', e => addFiles(e.dataTransfer.files));
+
+function setErr(id, msg) {
+  const el = $(id); if (el) el.setAttribute('aria-invalid', msg ? 'true' : 'false');
+  const e = $(id + '-err'); if (e) e.textContent = msg || '';
+  return !msg;
+}
+
+function validate() {
+  const v = id => $(id).value.trim();
+  const phone = v('phone').replace(/\D/g, '');
+  const checks = [
+    setErr('business', v('business') ? '' : 'צריך שם עסק'),
+    setErr('businessId', /^\d{8,9}$/.test(v('businessId').replace(/\D/g, '')) ? '' : 'מספר עוסק או ח״פ הוא 8–9 ספרות'),
+    setErr('contact', v('contact') ? '' : 'צריך שם של איש קשר'),
+    setErr('phone', /^0\d{8,9}$/.test(phone) ? '' : 'מספר טלפון ישראלי, למשל 050-1234567'),
+    setErr('email', /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v('email')) ? '' : 'כתובת מייל לא תקינה'),
+    setErr('terms', $('terms').checked ? '' : 'צריך לאשר את התנאים כדי להמשיך'),
+  ];
+  const sizeOk = files.reduce((a, f) => a + f.size, 0) <= MAX_BYTES;
+  return checks.every(Boolean) && sizeOk;
+}
+
+const toBase64 = f => new Promise((res, rej) => {
+  const r = new FileReader();
+  r.onload = () => res(String(r.result).split(',')[1] || '');
+  r.onerror = () => rej(r.error);
+  r.readAsDataURL(f);
+});
+
+function payMethod() { const r = form.querySelector('input[name="pay"]:checked'); return r ? r.value : 'אשראי'; }
+form.addEventListener('change', e => { if (e.target.name === 'pay') $('submitBtn').textContent = e.target.value === 'אשראי' ? 'המשך לתשלום' : 'שליחת ההרשמה'; });
+
+function showDone(id, demo) {
+  form.hidden = true; $('done').hidden = false;
+  $('doneId').textContent = id ? 'מספר הרשמה: ' + id : '';
+  $('demoNote').hidden = !demo;
+  if (payMethod() !== 'אשראי') {
+    const bit = payMethod() === 'ביט';
+    const box = $('payDetails'); box.replaceChildren(); box.hidden = false;
+    const line = (label, value, ltr) => { const p = document.createElement('div'); p.append(label + ' '); const s = document.createElement('span'); s.textContent = value; if (ltr) s.className = 'num'; p.append(s); return p; };
+    const head = document.createElement('b'); head.textContent = bit ? 'תשלום בביט' : 'פרטים להעברה בנקאית'; box.append(head);
+    if (bit) box.append(line('למספר:', BIT_PHONE, true));
+    else box.append(line('שם החשבון:', 'ברק תקשורת'), line('בנק:', 'מזרחי טפחות (20)'), line('סניף:', '484 (שדרות)', false), line('מספר חשבון:', '162279', true));
+    box.append(line('סכום חודשי:', '590 ₪ (500 ₪ + מע״מ)'));
+    const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'copy';
+    btn.textContent = bit ? 'העתקת המספר' : 'העתקת מספר החשבון';
+    btn.onclick = () => { const v = bit ? BIT_PHONE.replace(/-/g, '') : '162279'; (navigator.clipboard ? navigator.clipboard.writeText(v) : Promise.reject()).then(() => { btn.textContent = 'הועתק ✔'; }).catch(() => { btn.textContent = v; }); };
+    box.append(btn);
+    $('doneText').textContent = 'אחרי התשלום שלחו לנו צילום אישור בוואטסאפ, ונחזור אליכם עם הצעת עיצוב למודעה.';
+  } else if (PAYMENT_URL && !demo) {
+    $('doneTitle').textContent = 'מעבירים אתכם לתשלום…';
+    $('doneText').textContent = 'הפרטים נשמרו. אם הדף לא עובר תוך כמה שניות, לחצו כאן:';
+    const a = document.createElement('a'); a.href = PAYMENT_URL; a.textContent = ' לתשלום'; $('doneText').append(a);
+    setTimeout(() => { location.href = PAYMENT_URL; }, 1200);
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+form.addEventListener('submit', async e => {
+  e.preventDefault();
+  $('formErr').textContent = '';
+  if (!validate()) { $('formErr').textContent = 'יש כמה שדות לתקן למעלה.'; const bad = form.querySelector('[aria-invalid="true"]'); if (bad) bad.focus(); return; }
+
+  if (!SCRIPT_URL) { showDone('', true); return; }
+
+  const btn = $('submitBtn');
+  btn.disabled = true; btn.textContent = files.length ? 'מעלה קבצים ושומר…' : 'שומר…';
+  try {
+    const payload = {
+      business: $('business').value, businessId: $('businessId').value, category: $('category').value,
+      address: $('address').value, contact: $('contact').value, phone: $('phone').value,
+      email: $('email').value, adText: $('adText').value, notes: $('notes').value,
+      terms: $('terms').checked, pay: payMethod(), website: $('website').value,
+      files: await Promise.all(files.map(async f => ({ name: f.name, type: f.type, data: await toBase64(f) }))),
+    };
+    const res = await fetch(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) });
+    const out = await res.json();
+    if (!out.ok) throw new Error(out.error || 'השמירה נכשלה');
+    showDone(out.id, false);
+  } catch (err) {
+    $('formErr').textContent = (err && err.message && !/fetch|network|JSON/i.test(err.message) ? err.message : 'לא הצלחנו לשמור את ההרשמה. בדקו את החיבור ונסו שוב, או שלחו לנו וואטסאפ ל־054-219-3565.');
+    btn.disabled = false; btn.textContent = payMethod() === 'אשראי' ? 'המשך לתשלום' : 'שליחת ההרשמה';
+  }
+});
+
+form.addEventListener('input', e => { if (e.target.getAttribute('aria-invalid') === 'true') setErr(e.target.id, ''); });
+</script>
+</body>
+</html>
