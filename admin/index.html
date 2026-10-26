@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Huri · ניהול מפרסמים</title>
+<base target="_blank">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Secular+One&display=swap">
+<style>
+/* Layout: sticky header with slot meter; filter tabs; one column of advertiser cards. */
+:root {
+  --bg: #f1f2f7; --surface: #fff; --ink: #17203a; --muted: #5f6880; --line: #dfe2ec;
+  --panel: #131a2e; --panel-ink: #f4f1e6; --led: #f2b53a; --accent: #c98a12; --accent-ink: #1a1405;
+  --ok: #1d8a4b; --ok-bg: #dff3e6; --warn: #9a6a00; --warn-bg: #fff1c2; --err: #b3352b; --err-bg: #fbe1de;
+  --mute-bg: #eceef3; --wa: #1fa855; --focus: #2f6fe4;
+  --display: "Secular One", "Assistant", Arial, sans-serif; --body: "Assistant", Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root {
+  --bg: #0d1220; --surface: #161d31; --ink: #ecedf3; --muted: #a2a9bf; --line: #2a3350;
+  --panel: #080c18; --ok: #4cc27f; --ok-bg: #173826; --warn: #f2c14e; --warn-bg: #3a2f10; --err: #ff8a7e; --err-bg: #3d1a17;
+  --mute-bg: #222a40; --focus: #7aa5ff; color-scheme: dark;
+} }
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.45; }
+.wrap { max-width: 760px; margin: 0 auto; padding-left: 14px; padding-right: 14px; }
+
+header { background: var(--panel); color: var(--panel-ink); position: sticky; top: 0; z-index: 5; }
+header .wrap { padding-block: 14px 12px; display: grid; gap: 10px; }
+.top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.brand { font-family: var(--display); font-size: 20px; }
+.brand small { font-family: var(--body); color: var(--led); font-size: 12px; letter-spacing: .1em; display: block; direction: ltr; text-align: right; }
+.top a, .iconbtn { color: var(--panel-ink); background: rgba(255,255,255,.1); border: 0; border-radius: 8px; padding: 7px 11px; font: inherit; font-size: 14px; text-decoration: none; cursor: pointer; }
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.stat { background: rgba(255,255,255,.06); border-radius: 10px; padding: 8px 10px; min-width: 0; }
+.stat b { font-family: var(--display); font-weight: 400; font-size: 22px; color: var(--led); display: block; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 12px; color: #b9bdcc; }
+.meter { height: 8px; border-radius: 4px; background: rgba(255,255,255,.12); overflow: hidden; display: flex; }
+.meter i { background: var(--led); height: 100%; }
+.meter-label { font-size: 12px; color: #b9bdcc; display: flex; justify-content: space-between; font-variant-numeric: tabular-nums; }
+
+nav { display: flex; gap: 6px; overflow-x: auto; padding-block: 12px 4px; }
+nav button { flex: none; font: inherit; font-size: 15px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 999px; padding: 6px 13px; cursor: pointer; }
+nav button[aria-pressed="true"] { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+nav .n { font-variant-numeric: tabular-nums; opacity: .7; margin-inline-start: 4px; }
+.search { width: 100%; font: inherit; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 10px; padding: 9px 12px; margin-top: 6px; }
+
+main .wrap { padding-block: 10px 40px; display: grid; gap: 10px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.head { display: flex; gap: 12px; padding: 12px; align-items: flex-start; cursor: pointer; }
+.thumb { width: 58px; height: 58px; border-radius: 10px; background: var(--panel); flex: none; display: grid; place-items: center; color: var(--led); font-family: var(--display); font-size: 22px; overflow: hidden; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.who { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.name { font-weight: 700; font-size: 17px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sub { color: var(--muted); font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chip { flex: none; font-size: 13px; font-weight: 700; padding: 3px 9px; border-radius: 999px; background: var(--mute-bg); color: var(--muted); }
+.chip.s-ok { background: var(--ok-bg); color: var(--ok); }
+.chip.s-wait { background: var(--warn-bg); color: var(--warn); }
+.chip.s-end { background: var(--err-bg); color: var(--err); }
+.tasks { display: grid; gap: 6px; padding: 0 12px 10px; }
+.task { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: var(--warn-bg); color: var(--warn); border-radius: 10px; padding: 7px 10px; font-size: 14px; font-weight: 600; }
+.task.refresh { background: var(--ok-bg); color: var(--ok); }
+.task.commit { background: var(--mute-bg); color: var(--ink); }
+.task.paydue { background: var(--err-bg); color: var(--err); }
+.price-tag { font-variant-numeric: tabular-nums; color: var(--accent); font-weight: 700; }
+.deal { display: grid; gap: 8px; background: var(--bg); border-radius: 10px; padding: 10px; }
+.deal label { font-size: 14px; color: var(--muted); display: grid; gap: 4px; }
+input[type=date] { font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 9px; padding: 6px 8px; }
+.actions { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 12px 12px; }
+.btn { font: inherit; font-size: 14px; font-weight: 700; border-radius: 9px; padding: 7px 12px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.wa { background: var(--wa); border-color: var(--wa); color: #fff; }
+.btn.sm { padding: 5px 10px; font-size: 13px; }
+.btn:disabled { opacity: .5; cursor: progress; }
+.btn:focus-visible, nav button:focus-visible, .search:focus-visible, .head:focus-visible, select:focus-visible, textarea:focus-visible, input:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.details { border-top: 1px solid var(--line); padding: 12px; display: grid; gap: 10px; font-size: 15px; }
+dl { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px; }
+dt { color: var(--muted); }
+dd { margin: 0; min-width: 0; overflow-wrap: anywhere; white-space: pre-wrap; }
+.ltr { direction: ltr; unicode-bidi: isolate; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+select, textarea, input[type=number] { font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 9px; padding: 7px 9px; }
+textarea { width: 100%; min-height: 64px; resize: vertical; }
+.empty { text-align: center; color: var(--muted); padding: 40px 10px; background: var(--surface); border: 1px dashed var(--line); border-radius: 14px; }
+.toast { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); background: var(--ink); color: var(--surface); padding: 9px 16px; border-radius: 10px; font-weight: 600; z-index: 10; }
+.loading { text-align: center; color: var(--muted); padding: 30px; }
+.auth { position: fixed; inset: 0; z-index: 20; background: var(--panel); color: var(--panel-ink); display: grid; place-items: center; padding: 16px; }
+.auth form { width: 100%; max-width: 340px; display: grid; gap: 12px; }
+.auth h1 { font-family: var(--display); font-weight: 400; font-size: 26px; margin: 0; }
+.auth p { margin: 0; color: #c3c7d4; font-size: 15px; }
+.auth input { font: inherit; width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.08); color: var(--panel-ink); }
+.auth .btn { justify-content: center; padding: 12px; font-size: 16px; }
+.auth .err { color: #ff9b90; font-weight: 600; min-height: 1.2em; font-size: 14px; }
+@media (max-width: 480px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+@media (prefers-reduced-motion: no-preference) { .card { transition: box-shadow .15s; } .card:hover { box-shadow: 0 2px 10px rgba(20,30,60,.08); } }
+</style>
+</head>
+<body>
+<section class="auth" id="auth" hidden>
+  <form id="authForm" autocomplete="on">
+    <div class="brand"><small>Huri Networks</small></div>
+    <h1 id="authTitle">כניסה ללוח הניהול</h1>
+    <p id="authText">הזן את סיסמת הניהול.</p>
+    <input type="text" name="username" value="huri-admin" autocomplete="username" hidden>
+    <input id="pw" type="password" autocomplete="current-password" aria-label="סיסמה" placeholder="סיסמה">
+    <input id="pw2" type="password" autocomplete="new-password" aria-label="אימות סיסמה" placeholder="אימות סיסמה" hidden>
+    <button class="btn primary" id="authBtn" type="submit">כניסה</button>
+    <div class="err" id="authErr" role="alert"></div>
+  </form>
+</section>
+<header>
+  <div class="wrap">
+    <div class="top">
+      <div class="brand"><small>Huri Networks</small>מסך בית יעקב</div>
+      <div class="row">
+        <button class="iconbtn" id="reload" type="button" aria-label="רענון נתונים">רענון</button>
+        <a id="sheetLink" href="#">גיליון</a>
+        <button class="iconbtn" id="logout" type="button">יציאה</button>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat"><b id="sActive">–</b><span>פעילים</span></div>
+      <div class="stat"><b id="sPending">–</b><span>ממתינים לתשלום</span></div>
+      <div class="stat"><b id="sRevenue">–</b><span>לחודש, לפני מע״מ</span></div>
+      <div class="stat"><b id="sPerHour">–</b><span>הופעות בשעה למפרסם</span></div>
+    </div>
+    <div>
+      <div class="meter" aria-hidden="true"><i id="meterFill" style="width:0"></i></div>
+      <div class="meter-label"><span id="meterText">משבצות</span><span id="freeText"></span></div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <nav id="tabs" aria-label="סינון">
+      <button type="button" data-f="tasks" aria-pressed="true">לטיפול<span class="n" id="nTasks"></span></button>
+      <button type="button" data-f="פעיל" aria-pressed="false">פעילים<span class="n" id="nActive"></span></button>
+      <button type="button" data-f="ממתין לתשלום" aria-pressed="false">ממתינים<span class="n" id="nPending"></span></button>
+      <button type="button" data-f="all" aria-pressed="false">הכל<span class="n" id="nAll"></span></button>
+    </nav>
+    <input class="search" id="q" type="search" placeholder="חיפוש לפי עסק, איש קשר או טלפון" aria-label="חיפוש">
+    <div id="list"><div class="loading">טוען נתונים…</div></div>
+  </div>
+</main>
+
+<script>
+var state = { data: null, filter: 'tasks', q: '', open: {}, thumbs: {}, token: '' };
+try { state.token = localStorage.getItem('huriToken') || ''; } catch (_) {}
+var AUTH_FNS = { adminAuthState: 1, adminLogin: 1, adminSetPassword: 1 };
+var STATUS_CLASS = { 'פעיל': 's-ok', 'ממתין לתשלום': 's-wait', 'הסתיים': 's-end' };
+
+var API_URL = 'https://script.google.com/macros/s/AKfycbzXb-iPy1ggHHNqXfYmi3NNWNLL8-fj4LIvWj_o_BysL1GT3sTXIyloN3rbnsHVUVlv/exec';
+
+function call(fn) {
+  var args = Array.prototype.slice.call(arguments, 1);
+  if (!AUTH_FNS[fn]) args = [state.token].concat(args);
+  return fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ rpc: fn, args: args })
+  }).then(function (r) { return r.json(); }, function () { throw new Error('אין חיבור לשרת. בדוק את האינטרנט ונסה שוב.'); })
+    .then(function (out) {
+      if (out && out.ok) return out.result;
+      var e = new Error((out && out.error) || 'שגיאה');
+      if (e.message === 'AUTH') showAuth();
+      throw e;
+    });
+}
+function $(id) { return document.getElementById(id); }
+function el(tag, attrs, kids) {
+  var e = document.createElement(tag);
+  if (attrs) Object.keys(attrs).forEach(function (k) {
+    if (k === 'text') e.textContent = attrs[k];
+    else if (k === 'cls') e.className = attrs[k];
+    else if (k.indexOf('on') === 0) e.addEventListener(k.slice(2), attrs[k]);
+    else e.setAttribute(k, attrs[k]);
+  });
+  (kids || []).forEach(function (c) { if (c) e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+  return e;
+}
+function toast(msg) {
+  var t = el('div', { cls: 'toast', role: 'status', text: msg });
+  document.body.appendChild(t);
+  setTimeout(function () { t.remove(); }, 2200);
+}
+function fmtDate(iso) { if (!iso) return '—'; var p = iso.split('-'); return p[2] + '/' + p[1] + '/' + p[0]; }
+function shekel(n) { return '₪' + Number(n).toLocaleString('he-IL'); }
+
+function setData(d) { state.data = d; render(); }
+
+function renderStats() {
+  var s = state.data.stats;
+  $('sActive').textContent = s.active;
+  $('sPending').textContent = s.pending;
+  $('sRevenue').textContent = shekel(s.revenue);
+  $('sPerHour').textContent = s.perHour == null ? '–' : '~' + s.perHour;
+  $('meterFill').style.width = Math.min(100, s.active / s.maxSlots * 100) + '%';
+  $('meterText').textContent = s.active + ' מתוך ' + s.maxSlots + ' משבצות תפוסות';
+  $('freeText').textContent = s.free + ' פנויות';
+  $('sheetLink').href = state.data.sheetUrl;
+  var items = state.data.items;
+  $('nTasks').textContent = items.filter(function (x) { return x.tasks.length; }).length;
+  $('nActive').textContent = items.filter(function (x) { return x.status === 'פעיל'; }).length;
+  $('nPending').textContent = items.filter(function (x) { return x.status === 'ממתין לתשלום'; }).length;
+  $('nAll').textContent = items.length;
+}
+
+function visible() {
+  var q = state.q.trim().toLowerCase();
+  return state.data.items.filter(function (x) {
+    if (state.filter === 'tasks' && !x.tasks.length) return false;
+    if (state.filter !== 'tasks' && state.filter !== 'all' && x.status !== state.filter) return false;
+    if (!q) return true;
+    return [x.business, x.contact, x.phone, x.category, x.id].join(' ').toLowerCase().indexOf(q) >= 0;
+  });
+}
+
+function act(btn, fn) {
+  var args = Array.prototype.slice.call(arguments, 2);
+  btn.disabled = true;
+  return call.apply(null, [fn].concat(args)).then(function (d) { setData(d); return d; })
+    .catch(function (e) { btn.disabled = false; toast('לא נשמר: ' + (e && e.message || 'שגיאה')); throw e; });
+}
+
+function card(x) {
+  var thumb = el('div', { cls: 'thumb', 'aria-hidden': 'true', text: (x.business || '?').trim().charAt(0) });
+  if (state.thumbs[x.folderId]) { thumb.textContent = ''; thumb.appendChild(el('img', { src: state.thumbs[x.folderId], alt: '' })); }
+
+  var head = el('div', { cls: 'head', tabindex: '0', role: 'button', 'aria-expanded': state.open[x.id] ? 'true' : 'false' }, [
+    thumb,
+    el('div', { cls: 'who' }, [
+      el('div', { cls: 'name', text: x.business }),
+      el('div', { cls: 'sub', text: [x.contact, x.category].filter(Boolean).join(' · ') }),
+      el('div', { cls: 'sub' }, [el('span', { cls: 'ltr', text: x.phone }), x.customPrice ? el('span', { cls: 'price-tag', text: ' · ₪' + x.price + ' לחודש' }) : null, x.pay !== 'אשראי' ? el('span', { text: ' · ' + x.pay }) : null])
+    ]),
+    el('span', { cls: 'chip ' + (STATUS_CLASS[x.status] || ''), text: x.status })
+  ]);
+  function toggle() { state.open[x.id] = !state.open[x.id]; render(); }
+  head.addEventListener('click', toggle);
+  head.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
+
+  var tasks = el('div', { cls: 'tasks' }, x.tasks.map(function (t) {
+    return el('div', { cls: 'task ' + t.type }, [
+      el('span', { text: t.label }),
+      el('a', { cls: 'btn wa sm', href: t.wa, rel: 'noopener', text: 'וואטסאפ' })
+    ]);
+  }));
+
+  var actions = el('div', { cls: 'actions' });
+  if (x.status === 'ממתין לתשלום') {
+    actions.appendChild(el('button', { cls: 'btn primary', type: 'button', text: 'שילם · הפעל', onclick: function (e) { act(e.currentTarget, 'adminSetStatus', x.id, 'פעיל').then(function () { toast(x.business + ' פעיל מהיום'); }); } }));
+  }
+  if (x.status === 'פעיל' && x.pay !== 'אשראי') {
+    actions.appendChild(el('button', { cls: 'btn primary', type: 'button', text: 'התקבל תשלום', onclick: function (e) { act(e.currentTarget, 'adminMarkPaid', x.id).then(function () { toast('נרשם תשלום. לא לשכוח להפיק חשבונית'); }); } }));
+  }
+  if (x.status === 'פעיל') {
+    actions.appendChild(el('button', { cls: 'btn primary', type: 'button', text: 'ריענון בוצע היום', onclick: function (e) { act(e.currentTarget, 'adminMarkRefresh', x.id).then(function () { toast('ריענון נרשם'); }); } }));
+  }
+  if (x.status === 'מושהה') {
+    actions.appendChild(el('button', { cls: 'btn primary', type: 'button', text: 'החזר לפעיל', onclick: function (e) { act(e.currentTarget, 'adminSetStatus', x.id, 'פעיל'); } }));
+  }
+  if (!x.tasks.length) actions.appendChild(el('a', { cls: 'btn wa', href: x.waChat, rel: 'noopener', text: 'וואטסאפ' }));
+  if (x.folderUrl) actions.appendChild(el('a', { cls: 'btn', href: x.folderUrl, rel: 'noopener', text: 'קבצים' }));
+
+  var c = el('article', { cls: 'card' }, [head, x.tasks.length ? tasks : null, actions]);
+  if (state.open[x.id]) c.appendChild(details(x));
+  if (x.folderId && !(x.folderId in state.thumbs)) loadThumb(x.folderId);
+  return c;
+}
+
+function details(x) {
+  var rows = [
+    ['מזהה', x.id], ['ח״פ / עוסק', x.businessId], ['מייל', x.email], ['כתובת', x.address],
+    ['נרשם', fmtDate(x.registered)], ['תחילת פרסום', fmtDate(x.start)], ['ריענון אחרון', fmtDate(x.lastRefresh)],
+    ['ריענון הבא', x.nextRefresh ? fmtDate(x.nextRefresh) : '—'], ['מחיר חודשי', '₪' + x.price + ' + מע״מ' + (x.customPrice ? ' (מחיר אישי)' : '')],
+    ['התחייבות עד', x.commitEnd ? fmtDate(x.commitEnd) : ''], ['אמצעי תשלום', x.pay + ' · ' + x.priceVat + ' כולל מע״מ'],
+    ['שולם עד', x.pay !== 'אשראי' ? (x.paidUntil ? fmtDate(x.paidUntil) : '—') : ''], ['רעיון למודעה', x.adText], ['הערות הלקוח', x.notes]
+  ].filter(function (r) { return r[1]; });
+  var dl = el('dl');
+  rows.forEach(function (r) {
+    dl.appendChild(el('dt', { text: r[0] }));
+    dl.appendChild(el('dd', { cls: /מייל|ח״פ/.test(r[0]) ? 'ltr' : '', text: r[1] }));
+  });
+
+  var sel = el('select', { id: 'st-' + x.id, 'aria-label': 'סטטוס' });
+  state.data.statuses.forEach(function (s) { var o = el('option', { value: s, text: s }); if (s === x.status) o.selected = true; sel.appendChild(o); });
+  var saveSt = el('button', { cls: 'btn sm', type: 'button', text: 'עדכון סטטוס', onclick: function (e) { if (sel.value !== x.status) act(e.currentTarget, 'adminSetStatus', x.id, sel.value).then(function () { toast('הסטטוס עודכן'); }); } });
+
+  var extra = null;
+  if (x.status === 'פעיל') {
+    var days = el('input', { type: 'number', min: '1', max: '60', value: '1', id: 'days-' + x.id, 'aria-label': 'מספר ימים', style: 'width:72px' });
+    extra = el('div', { cls: 'row' }, [
+      el('span', { text: 'המסך לא עבד' }), days, el('span', { text: 'ימים' }),
+      el('button', { cls: 'btn sm', type: 'button', text: 'דחה ריענון', onclick: function (e) { act(e.currentTarget, 'adminAddDays', x.id, days.value).then(function () { toast('המועד נדחה. לדחות גם את החיוב בסמארטבי'); }); } })
+    ]);
+  }
+
+  var priceIn = el('input', { type: 'number', min: '1', max: '20000', step: '1', id: 'price-' + x.id, value: String(x.price), style: 'width:100px', 'aria-label': 'מחיר חודשי לפני מע״מ' });
+  var endIn = el('input', { type: 'date', id: 'end-' + x.id, value: x.commitEnd || '', 'aria-label': 'התחייבות עד' });
+  var payIn = el('select', { id: 'pay-' + x.id, 'aria-label': 'אמצעי תשלום' });
+  state.data.payMethods.forEach(function (p) { var o = el('option', { value: p, text: p }); if (p === x.pay) o.selected = true; payIn.appendChild(o); });
+  var paidIn = el('input', { type: 'date', id: 'paid-' + x.id, value: x.paidUntil || '', 'aria-label': 'שולם עד' });
+  function plusMonths(n) {
+    var base = x.start ? new Date(x.start + 'T00:00:00') : new Date();
+    base.setMonth(base.getMonth() + n);
+    endIn.value = base.getFullYear() + '-' + ('0' + (base.getMonth() + 1)).slice(-2) + '-' + ('0' + base.getDate()).slice(-2);
+  }
+  var deal = el('div', { cls: 'deal' }, [
+    el('div', { cls: 'row' }, [
+      el('label', {}, ['מחיר לחודש, לפני מע״מ', el('span', { cls: 'row' }, [priceIn, el('span', { text: '₪' })])]),
+      el('label', {}, ['התחייבות עד', endIn])
+    ]),
+    el('div', { cls: 'row' }, [
+      el('label', {}, ['אמצעי תשלום', payIn]),
+      el('label', {}, ['שולם עד (העברה / ביט)', paidIn])
+    ]),
+    el('div', { cls: 'row' }, [
+      el('button', { cls: 'btn sm', type: 'button', text: '+3 חודשים', onclick: function () { plusMonths(3); } }),
+      el('button', { cls: 'btn sm', type: 'button', text: '+6 חודשים', onclick: function () { plusMonths(6); } }),
+      el('button', { cls: 'btn sm', type: 'button', text: 'שנה', onclick: function () { plusMonths(12); } }),
+      el('button', { cls: 'btn sm', type: 'button', text: 'ללא', onclick: function () { endIn.value = ''; } })
+    ]),
+    el('div', { cls: 'row' }, [
+      el('button', { cls: 'btn sm primary', type: 'button', text: 'שמירת תנאי תשלום', onclick: function (e) {
+        act(e.currentTarget, 'adminSetDeal', x.id, priceIn.value, endIn.value, payIn.value, paidIn.value).then(function () { toast(payIn.value === 'אשראי' ? 'נשמר. לעדכן גם את החיוב בסמארטבי' : 'נשמר'); });
+      } }),
+      el('button', { cls: 'btn sm', type: 'button', text: 'חזרה למחיר רגיל', onclick: function (e) {
+        act(e.currentTarget, 'adminSetDeal', x.id, '', '').then(function () { toast('הוחזר למחיר הרגיל'); });
+      } })
+    ])
+  ]);
+
+  var note = el('textarea', { id: 'note-' + x.id, 'aria-label': 'הערות פנימיות', placeholder: 'הערות פנימיות (רק אתה רואה)' });
+  note.value = x.internal || '';
+  var saveNote = el('button', { cls: 'btn sm', type: 'button', text: 'שמירת הערה', onclick: function (e) {
+    var b = e.currentTarget; b.disabled = true;
+    call('adminSaveNote', x.id, note.value).then(function () { x.internal = note.value; b.disabled = false; toast('ההערה נשמרה'); })
+      .catch(function () { b.disabled = false; toast('ההערה לא נשמרה'); });
+  } });
+
+  return el('div', { cls: 'details' }, [dl, el('div', { cls: 'row' }, [sel, saveSt]), deal, extra, note, el('div', { cls: 'row' }, [saveNote])]);
+}
+
+function loadThumb(folderId) {
+  state.thumbs[folderId] = '';
+  call('adminThumb', folderId).then(function (src) { if (src) { state.thumbs[folderId] = src; render(); } }).catch(function () {});
+}
+
+function render() {
+  if (!state.data) return;
+  renderStats();
+  var list = $('list');
+  list.replaceChildren();
+  var items = visible();
+  if (!items.length) {
+    var msg = state.q ? 'לא נמצאו מפרסמים לחיפוש הזה.'
+      : state.filter === 'tasks' ? 'אין משימות פתוחות. הכל מטופל ✔'
+      : state.data.items.length ? 'אין מפרסמים בסטטוס הזה.' : 'עוד אין מפרסמים. הרשמות מהטופס יופיעו כאן.';
+    list.appendChild(el('div', { cls: 'empty', text: msg }));
+    return;
+  }
+  var frag = document.createDocumentFragment();
+  items.forEach(function (x) { frag.appendChild(card(x)); });
+  list.appendChild(frag);
+  list.style.display = 'grid'; list.style.gap = '10px';
+}
+
+$('tabs').addEventListener('click', function (e) {
+  var b = e.target.closest('button'); if (!b) return;
+  state.filter = b.getAttribute('data-f');
+  Array.prototype.forEach.call(this.querySelectorAll('button'), function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+  render();
+});
+$('q').addEventListener('input', function () { state.q = this.value; render(); });
+$('reload').addEventListener('click', load);
+$('logout').addEventListener('click', function () {
+  call('adminLogout').catch(function () {});
+  setToken(''); state.data = null; showAuth();
+});
+
+function setToken(t) { state.token = t; try { if (t) localStorage.setItem('huriToken', t); else localStorage.removeItem('huriToken'); } catch (_) {} }
+
+var authMode = 'login';
+function showAuth() {
+  $('auth').hidden = false; $('authErr').textContent = '';
+  call('adminAuthState').then(function (st) {
+    if (st.setupOpen) {
+      authMode = 'setup';
+      $('authTitle').textContent = 'הגדרת סיסמת ניהול';
+      $('authText').textContent = 'בחר סיסמה של 8 תווים לפחות. היא תשמש אותך בכל מכשיר.';
+      $('pw').setAttribute('autocomplete', 'new-password'); $('pw2').hidden = false; $('authBtn').textContent = 'שמירה וכניסה';
+    } else if (!st.hasPassword) {
+      authMode = 'none';
+      $('authTitle').textContent = 'הלוח עוד לא הוגדר';
+      $('authText').textContent = 'כדי להגדיר סיסמה, יש להריץ את openAdminSetup בעורך הסקריפט.';
+      $('pw').hidden = true; $('authBtn').hidden = true;
+    } else {
+      authMode = 'login';
+    }
+    if (!$('pw').hidden) $('pw').focus();
+  }).catch(function () { $('authErr').textContent = 'אין חיבור לשרת. נסה לרענן.'; });
+}
+$('authForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+  var pw = $('pw').value, btn = $('authBtn');
+  if (authMode === 'none') return;
+  if (authMode === 'setup' && pw !== $('pw2').value) { $('authErr').textContent = 'הסיסמאות לא זהות.'; return; }
+  btn.disabled = true; $('authErr').textContent = '';
+  call(authMode === 'setup' ? 'adminSetPassword' : 'adminLogin', pw).then(function (r) {
+    setToken(r.token); $('pw').value = ''; $('pw2').value = ''; $('auth').hidden = true; btn.disabled = false; load();
+  }).catch(function (err) { btn.disabled = false; $('authErr').textContent = (err && err.message) || 'הכניסה נכשלה.'; });
+});
+
+function load() {
+  if (!state.token) { showAuth(); return; }
+  call('getAdminData').then(function (d) {
+    if (state.filter === 'tasks' && !d.stats.tasks && d.items.length) {
+      state.filter = 'all';
+      Array.prototype.forEach.call(document.querySelectorAll('#tabs button'), function (x) { x.setAttribute('aria-pressed', x.getAttribute('data-f') === 'all' ? 'true' : 'false'); });
+    }
+    setData(d);
+  }).catch(function (e) {
+    if (e && /AUTH/.test(e.message || '')) return;
+    $('list').replaceChildren(el('div', { cls: 'empty', text: 'לא הצלחתי לטעון את הנתונים: ' + (e && e.message || 'שגיאה') }));
+  });
+}
+load();
+</script>
+</body>
+</html>
