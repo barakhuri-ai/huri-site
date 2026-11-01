@@ -140,7 +140,7 @@ footer a { color: inherit; }
       <span><b><bdi dir="ltr">05:00–20:00</bdi></b>א׳–ה׳</span>
       <span><b>500 ₪</b>+ מע״מ לחודש</span>
     </div>
-    <p class="promo"><b>מבצע הצטרפות:</b> 50% הנחה על החודש הראשון. <bdi>250 ₪</bdi> + מע״מ במקום <bdi>500 ₪</bdi>.</p>
+    <p class="promo promo-only" hidden><b>מבצע הצטרפות:</b> 50% הנחה על החודש הראשון. <bdi>250 ₪</bdi> + מע״מ במקום <bdi>500 ₪</bdi>.</p>
     <div>
       <div class="bar" aria-hidden="true"><i></i></div>
       <div class="bar-label">כך נראית משבצת של 12 שניות</div>
@@ -241,11 +241,15 @@ footer a { color: inherit; }
           <span>קראתי ואני מאשר/ת את <a href="terms.html" target="_blank" rel="noopener">תנאי ההתקשרות המלאים</a> ואת שמירת הפרטים</span>
         </label>
         <div class="err" id="terms-err"></div>
-        <div class="price">
+        <div class="price regular-only">
+          <span>תשלום חודשי</span>
+          <span><span class="amt">500 ₪</span> <span class="vat">+ מע״מ</span></span>
+        </div>
+        <div class="price promo-only" hidden>
           <span>חודש ראשון <small class="tag">50% הנחה</small></span>
           <span><s class="was">500 ₪</s> <span class="amt">250 ₪</span> <span class="vat">+ מע״מ</span></span>
         </div>
-        <div class="price next">
+        <div class="price next promo-only" hidden>
           <span>מהחודש השני</span>
           <span><span class="amt sm">500 ₪</span> <span class="vat">+ מע״מ לחודש</span></span>
         </div>
@@ -354,6 +358,9 @@ const toBase64 = f => new Promise((res, rej) => {
   r.readAsDataURL(f);
 });
 
+// קישור מבצע: ?offer=50 מציג 50% על החודש הראשון. בלי הפרמטר הדף מציג את המחיר הרגיל.
+const OFFER = new URLSearchParams(location.search).get('offer') === '50';
+if (OFFER) { document.querySelectorAll('.promo-only').forEach(e => { e.hidden = false; }); document.querySelectorAll('.regular-only').forEach(e => { e.hidden = true; }); }
 function payMethod() { const r = form.querySelector('input[name="pay"]:checked'); return r ? r.value : 'העברה בנקאית'; }
 form.addEventListener('change', e => { if (e.target.name === 'pay') $('submitBtn').textContent = e.target.value === 'אשראי' ? 'המשך לתשלום' : 'שליחת ההרשמה'; });
 
@@ -368,8 +375,10 @@ function showDone(id, demo) {
     const head = document.createElement('b'); head.textContent = bit ? 'תשלום בביט' : 'פרטים להעברה בנקאית'; box.append(head);
     if (bit) box.append(line('למספר:', BIT_PHONE, true));
     else box.append(line('שם החשבון:', 'ברק תקשורת'), line('בנק:', 'מזרחי טפחות (20)'), line('סניף:', '484 (שדרות)', false), line('מספר חשבון:', '162279', true));
-    box.append(line('לתשלום עכשיו (חודש ראשון, 50% הנחה):', '295 ₪ (250 ₪ + מע״מ)'));
-    box.append(line('מהחודש השני:', '590 ₪ לחודש (500 ₪ + מע״מ)'));
+    if (OFFER) {
+      box.append(line('לתשלום עכשיו (חודש ראשון, 50% הנחה):', '295 ₪ (250 ₪ + מע״מ)'));
+      box.append(line('מהחודש השני:', '590 ₪ לחודש (500 ₪ + מע״מ)'));
+    } else box.append(line('סכום חודשי:', '590 ₪ (500 ₪ + מע״מ)'));
     const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'copy';
     btn.textContent = bit ? 'העתקת המספר' : 'העתקת מספר החשבון';
     btn.onclick = () => { const v = bit ? BIT_PHONE.replace(/-/g, '') : '162279'; (navigator.clipboard ? navigator.clipboard.writeText(v) : Promise.reject()).then(() => { btn.textContent = 'הועתק ✔'; }).catch(() => { btn.textContent = v; }); };
@@ -397,7 +406,7 @@ form.addEventListener('submit', async e => {
     const payload = {
       business: $('business').value, businessId: $('businessId').value, category: $('category').value,
       address: $('address').value, contact: $('contact').value, phone: $('phone').value,
-      email: $('email').value, adText: $('adText').value, notes: $('notes').value,
+      email: $('email').value, adText: $('adText').value, notes: (OFFER ? '[מבצע 50% חודש ראשון] ' : '') + $('notes').value,
       terms: $('terms').checked, pay: payMethod(), website: $('website').value,
       files: await Promise.all(files.map(async f => ({ name: f.name, type: f.type, data: await toBase64(f) }))),
     };
