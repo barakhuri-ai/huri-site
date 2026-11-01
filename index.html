@@ -96,6 +96,12 @@ input[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: var(--
 .price { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 12px; }
 .price .amt { font-family: var(--display); font-size: 26px; font-variant-numeric: tabular-nums; }
 .price .vat { font-size: 14px; color: var(--muted); }
+.price.next { border-top: 0; padding-top: 0; margin-top: -4px; color: var(--muted); }
+.price .amt.sm { font-size: 19px; }
+.price .was { color: var(--muted); font-size: 16px; margin-left: 4px; }
+.price .tag { display: inline-block; background: var(--accent, #c98a12); color: #fff; font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 99px; margin-right: 6px; vertical-align: middle; }
+.promo { margin: 10px 0 0; padding: 8px 12px; border-radius: 10px; background: rgba(242,181,58,.14); border: 1px solid rgba(242,181,58,.45); font-size: 15px; }
+.promo b { color: var(--led, #f2b53a); }
 .submit { font: inherit; font-weight: 700; font-size: 18px; border: 0; border-radius: 12px; padding: 14px 18px; background: var(--accent); color: var(--accent-ink); cursor: pointer; width: 100%; }
 .submit:disabled { opacity: .6; cursor: progress; }
 .form-err { color: var(--err); font-weight: 600; text-align: center; }
@@ -128,12 +134,13 @@ footer a { color: inherit; }
   <div class="wrap">
     <div class="brand">Huri Networks</div>
     <h1>פרסום על המסך בבית הכנסת בית יעקב, נתיבות</h1>
-    <p class="lede">ממלאים את הפרטים, מעלים לוגו או גרפיקה, ועוברים לתשלום. אנחנו מעצבים את המודעה ומעלים אותה למסך.</p>
+    <p class="lede">ממלאים את הפרטים, מעלים לוגו או גרפיקה, ומשלמים בהעברה בנקאית או בביט. אנחנו מעצבים את המודעה ומעלים אותה למסך.</p>
     <div class="slot">
       <span><b>12</b>שניות בכל סבב</span>
       <span><b><bdi dir="ltr">05:00–20:00</bdi></b>א׳–ה׳</span>
       <span><b>500 ₪</b>+ מע״מ לחודש</span>
     </div>
+    <p class="promo"><b>מבצע הצטרפות:</b> 50% הנחה על החודש הראשון. <bdi>250 ₪</bdi> + מע״מ במקום <bdi>500 ₪</bdi>.</p>
     <div>
       <div class="bar" aria-hidden="true"><i></i></div>
       <div class="bar-label">כך נראית משבצת של 12 שניות</div>
@@ -224,7 +231,7 @@ footer a { color: inherit; }
         <ul class="terms">
           <li>מודעה של עד 12 שניות בסבב רציף: א׳–ה׳ <bdi dir="ltr">05:00–20:00</bdi>, ושישי עד שעתיים לפני כניסת שבת.</li>
           <li>בשבתות ובחגים מוצג תוכן קודש בלבד, ללא פרסומות.</li>
-          <li>תשלום חודשי באשראי, בהעברה בנקאית או בביט, ללא התחייבות. ביטול בהודעה לפחות שבוע לפני התשלום הבא.</li>
+          <li>תשלום חודשי בהעברה בנקאית או בביט, ללא התחייבות. ביטול בהודעה לפחות שבוע לפני התשלום הבא.</li>
           <li>המחיר כולל עיצוב מודעה ראשונית וריענון אחד בכל חודש. סרטון, אנימציה או עיצוב חדש לגמרי בתוספת תשלום.</li>
           <li>תוכן המודעה כפוף לאישור ולהתאמה לאופי בית הכנסת.</li>
           <li>הפרטים נשמרים לצורך ההתקשרות, החשבוניות והפרסום בלבד, ולא מועברים לאחרים.</li>
@@ -235,17 +242,23 @@ footer a { color: inherit; }
         </label>
         <div class="err" id="terms-err"></div>
         <div class="price">
-          <span>תשלום חודשי</span>
-          <span><span class="amt">500 ₪</span> <span class="vat">+ מע״מ</span></span>
+          <span>חודש ראשון <small class="tag">50% הנחה</small></span>
+          <span><s class="was">500 ₪</s> <span class="amt">250 ₪</span> <span class="vat">+ מע״מ</span></span>
+        </div>
+        <div class="price next">
+          <span>מהחודש השני</span>
+          <span><span class="amt sm">500 ₪</span> <span class="vat">+ מע״מ לחודש</span></span>
         </div>
         <fieldset class="paymethods">
           <legend>איך נוח לכם לשלם?</legend>
-          <label for="pay-card"><input type="radio" name="pay" id="pay-card" value="אשראי" checked>אשראי<small>חיוב חודשי אוטומטי</small></label>
-          <label for="pay-bank"><input type="radio" name="pay" id="pay-bank" value="העברה בנקאית">העברה בנקאית<small>פרטים יישלחו בוואטסאפ</small></label>
+          <!-- אשראי יחזור אחרי אישור מקס/Smartbee:
+          <label for="pay-card"><input type="radio" name="pay" id="pay-card" value="אשראי">אשראי<small>חיוב חודשי אוטומטי</small></label>
+          -->
+          <label for="pay-bank"><input type="radio" name="pay" id="pay-bank" value="העברה בנקאית" checked>העברה בנקאית<small>פרטים יישלחו בוואטסאפ</small></label>
           <label for="pay-bit"><input type="radio" name="pay" id="pay-bit" value="ביט">ביט<small>פרטים יישלחו בוואטסאפ</small></label>
         </fieldset>
         <div class="hp" aria-hidden="true"><label for="website">אתר</label><input id="website" name="website" tabindex="-1" autocomplete="off"></div>
-        <button class="submit" id="submitBtn" type="submit">המשך לתשלום</button>
+        <button class="submit" id="submitBtn" type="submit">שליחת ההרשמה</button>
         <div class="form-err" id="formErr" role="alert"></div>
       </fieldset>
     </form>
@@ -341,7 +354,7 @@ const toBase64 = f => new Promise((res, rej) => {
   r.readAsDataURL(f);
 });
 
-function payMethod() { const r = form.querySelector('input[name="pay"]:checked'); return r ? r.value : 'אשראי'; }
+function payMethod() { const r = form.querySelector('input[name="pay"]:checked'); return r ? r.value : 'העברה בנקאית'; }
 form.addEventListener('change', e => { if (e.target.name === 'pay') $('submitBtn').textContent = e.target.value === 'אשראי' ? 'המשך לתשלום' : 'שליחת ההרשמה'; });
 
 function showDone(id, demo) {
@@ -355,7 +368,8 @@ function showDone(id, demo) {
     const head = document.createElement('b'); head.textContent = bit ? 'תשלום בביט' : 'פרטים להעברה בנקאית'; box.append(head);
     if (bit) box.append(line('למספר:', BIT_PHONE, true));
     else box.append(line('שם החשבון:', 'ברק תקשורת'), line('בנק:', 'מזרחי טפחות (20)'), line('סניף:', '484 (שדרות)', false), line('מספר חשבון:', '162279', true));
-    box.append(line('סכום חודשי:', '590 ₪ (500 ₪ + מע״מ)'));
+    box.append(line('לתשלום עכשיו (חודש ראשון, 50% הנחה):', '295 ₪ (250 ₪ + מע״מ)'));
+    box.append(line('מהחודש השני:', '590 ₪ לחודש (500 ₪ + מע״מ)'));
     const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'copy';
     btn.textContent = bit ? 'העתקת המספר' : 'העתקת מספר החשבון';
     btn.onclick = () => { const v = bit ? BIT_PHONE.replace(/-/g, '') : '162279'; (navigator.clipboard ? navigator.clipboard.writeText(v) : Promise.reject()).then(() => { btn.textContent = 'הועתק ✔'; }).catch(() => { btn.textContent = v; }); };
