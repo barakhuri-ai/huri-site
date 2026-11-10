@@ -255,14 +255,12 @@ footer a { color: inherit; }
         </div>
         <fieldset class="paymethods">
           <legend>איך נוח לכם לשלם?</legend>
-          <!-- אשראי יחזור אחרי אישור מקס/Smartbee:
-          <label for="pay-card"><input type="radio" name="pay" id="pay-card" value="אשראי">אשראי<small>חיוב חודשי אוטומטי</small></label>
-          -->
-          <label for="pay-bank"><input type="radio" name="pay" id="pay-bank" value="העברה בנקאית" checked>העברה בנקאית<small>פרטים יישלחו בוואטסאפ</small></label>
+          <label for="pay-card" class="regular-only"><input type="radio" name="pay" id="pay-card" value="אשראי" checked>אשראי<small>חיוב חודשי אוטומטי, ביטול בכל עת</small></label>
+          <label for="pay-bank"><input type="radio" name="pay" id="pay-bank" value="העברה בנקאית">העברה בנקאית<small>פרטים יישלחו בוואטסאפ</small></label>
           <label for="pay-bit"><input type="radio" name="pay" id="pay-bit" value="ביט">ביט<small>פרטים יישלחו בוואטסאפ</small></label>
         </fieldset>
         <div class="hp" aria-hidden="true"><label for="website">אתר</label><input id="website" name="website" tabindex="-1" autocomplete="off"></div>
-        <button class="submit" id="submitBtn" type="submit">שליחת ההרשמה</button>
+        <button class="submit" id="submitBtn" type="submit">המשך לתשלום</button>
         <div class="form-err" id="formErr" role="alert"></div>
       </fieldset>
     </form>
@@ -285,7 +283,7 @@ footer a { color: inherit; }
 <script>
 // ───── הגדרות: שתי שורות שמתעדכנות בהתקנה ─────
 const SCRIPT_URL  = 'https://script.google.com/macros/s/AKfycbzXb-iPy1ggHHNqXfYmi3NNWNLL8-fj4LIvWj_o_BysL1GT3sTXIyloN3rbnsHVUVlv/exec';   // כתובת ה־Web App מגוגל (מסתיימת ב־/exec)
-const PAYMENT_URL = '';   // קישור לדף התשלום של סמארטבי
+const PAYMENT_URL = 'https://smartbee.co.il/public-pages/?redirect-path=pay/6af2da4722412ab13bd9b44e';   // קישור לדף התשלום של סמארטבי
 const BIT_PHONE   = '054-219-3565';
 
 const MAX_FILES = 6, MAX_BYTES = 25 * 1024 * 1024;
@@ -360,7 +358,11 @@ const toBase64 = f => new Promise((res, rej) => {
 
 // קישור מבצע: ?offer=50 מציג 50% על החודש הראשון. בלי הפרמטר הדף מציג את המחיר הרגיל.
 const OFFER = new URLSearchParams(location.search).get('offer') === '50';
-if (OFFER) { document.querySelectorAll('.promo-only').forEach(e => { e.hidden = false; }); document.querySelectorAll('.regular-only').forEach(e => { e.hidden = true; }); }
+if (OFFER) {
+  document.querySelectorAll('.promo-only').forEach(e => { e.hidden = false; }); document.querySelectorAll('.regular-only').forEach(e => { e.hidden = true; });
+  // אין עדיין דף אשראי למבצע: לקוחות המבצע משלמים את החודש הראשון בהעברה או בביט
+  const card = $('pay-card'); if (card) { card.checked = false; card.disabled = true; } $('pay-bank').checked = true; $('submitBtn').textContent = 'שליחת ההרשמה';
+}
 function payMethod() { const r = form.querySelector('input[name="pay"]:checked'); return r ? r.value : 'העברה בנקאית'; }
 form.addEventListener('change', e => { if (e.target.name === 'pay') $('submitBtn').textContent = e.target.value === 'אשראי' ? 'המשך לתשלום' : 'שליחת ההרשמה'; });
 
